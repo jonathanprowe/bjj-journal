@@ -99,12 +99,13 @@ export function listEntries(q?: string, type?: string): Entry[] {
 
   sql += ' ORDER BY date DESC, created_at DESC';
 
-  return db.prepare(sql).all(...params) as Entry[];
+  return (db.prepare(sql).all(...params) as object[]).map((r) => Object.assign({}, r) as Entry);
 }
 
 export function getEntry(id: number): Entry | undefined {
   const db = getDb();
-  return db.prepare('SELECT * FROM entries WHERE id = ?').get(id) as Entry | undefined;
+  const row = db.prepare('SELECT * FROM entries WHERE id = ?').get(id);
+  return row ? (Object.assign({}, row) as Entry) : undefined;
 }
 
 export function createEntry(input: EntryInput): Entry {
